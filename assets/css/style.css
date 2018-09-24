@@ -1,0 +1,8 @@
+body {
+    background-color: grey;
+}
+
+.card-header, .input-group-text {
+    background-color: rgb(102, 3, 3);
+    color: white;
+}
