@@ -6,3 +6,13 @@ body {
     background-color: rgb(102, 3, 3);
     color: white;
 }
+
+tr {
+    border: black solid 1px;
+}
+
+#required {
+font-style: italic;
+font-size: 12px;
+font-weight: bold;
+}

@@ -18,10 +18,8 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="assets/css/style.css">
 
-    <!-- jQuery and javascript -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-
-
+    <!-- firebase -->
+    <!-- <script defer src="https://www.gstatic.com/firebasejs/5.5.1/firebase.js"></script> -->
 
     <!-- Browser title -->
     <title>Train Schedule</title>
@@ -37,8 +35,20 @@
 
         <div class="card">
             <h5 class="card-header"><i class="fas fa-train"> Current Train Schedule</i></h5>
-            <div class="card-body">
-                <h5 class="card-title">Schedule goes here</h5>
+            <div class="text-center card-body">
+                    <table class="table">
+                            <thead class="thead-dark">
+                              <tr>
+                                <th scope="col">Train Name</th>
+                                <th scope="col">Destination</th>
+                                <th scope="col">Frequency</th>
+                                <th scope="col">Next Arrival</th>
+                                <th scope="col">Minutes Away</th>
+                              </tr>
+                            </thead>
+                            <tbody class="trainInput">
+                            </tbody>
+                          </table>
             </div>
         </div>
         <p></p>
@@ -50,22 +60,23 @@
                     <div class="input-group-prepend">
                         <span class="input-group-text">Train Name</span>
                     </div>
-                    <input type="text" aria-label="First name" class="form-control">
+                    <input id="name" type="text" aria-label="Name" class="form-control" required>
                 </div>
                 <p></p>
                 <div class="input-group">
                     <div class="input-group-prepend">
                         <span class="input-group-text">Destination</span>
                     </div>
-                    <input type="text" aria-label="First name" class="form-control">
+                    <input id="destination" type="text" aria-label="Destination" class="form-control" required>
                 </div>
                 <p></p>
                 <div class="input-group mb-3">
                     <div class="input-group-prepend">
-                        <label class="input-group-text" for="inputGroupSelect01">Select Hours</label>
+                        <label class="input-group-text" for="hours">First Train*</label>
                     </div>
-                    <select class="custom-select" id="inputGroupSelect01">
-                        <option selected>Hours... (In Military Time)</option>
+
+                    <select required class="custom-select" id="hours">
+                        <option selected value ="">Hours (HH)</option>
                         <option value="0">0 (12 am)</option>
                         <option value="1">1 (1 am)</option>
                         <option value="2">2 (2 am)</option>
@@ -91,10 +102,9 @@
                         <option value="22">22 (10 pm)</option>
                         <option value="23">23 (11 pm)</option>
                     </select>
-                    <label class="input-group-text" for="inputGroupSelect01">Select Minutes</label>
 
-                    <select class="custom-select" id="inputGroupSelect01">
-                        <option selected>Minutes...</option>
+                    <select required class="custom-select" id="minutes">
+                        <option selected value="">Minutes (MM)</option>
                         <option value="00">:00</option>
                         <option value="05">:05</option>
                         <option value="10">:10</option>
@@ -114,15 +124,18 @@
                     <div class="input-group-prepend">
                         <span class="input-group-text">Frequency</span>
                     </div>
-                    <input type="text" aria-label="First name" class="form-control">
+                    <input id="frequency" type="number" aria-label="Frequency" class="form-control" required>
                 </div>
                 <p></p>
-                <button type="button" class="btn btn-dark btn-lg btn-block">Submit</button>
+                <button type="submit" id="addTrain" class="btn btn-dark btn-lg btn-block">Submit</button>
             </div>
+            <p class="ml-3" id="required">*Military Time Format [HH:MM]*</p>
         </div>
     </div>
 
 
+    <!-- jQuery and javascript -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="assets/javascript/schedule.js" type="text/javascript"></script>
 </body>
 
