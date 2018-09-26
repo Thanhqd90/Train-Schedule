@@ -1,5 +1,11 @@
-$(document).ready(function(){
+$(document).ready(function () {
+  
+// Global
+  // var puns = [];
+  var nextTrain = 0;
+  var remaining = 0;
 
+// Initialize firebase
   var config = {
     apiKey: "AIzaSyC0FCC6915iAGGf_YASjMvXQ5C715ewNUI",
     authDomain: "train-scheduler-82029.firebaseapp.com",
@@ -13,8 +19,14 @@ $(document).ready(function(){
 
   var database = firebase.database();
   var ref = database.ref()
-  
-  ref.on("value", gotData, errData)
+
+
+  ref.on("value", gotData)
+
+  function clearField() {
+    $("#name, #destination, #hours, #minutes, #frequency").val("");
+  }
+
 
   function gotData(data) {
     var trainList = $("td");
@@ -26,82 +38,70 @@ $(document).ready(function(){
     var trains = data.val();
     var keys = Object.keys(trains);
     console.log(keys);
-    for (var i = 0; i < keys.length; i++){
-    var k = keys[i];
-    var trainz = trains[k].trainName;
-    var trainzd = trains[k].trainDestination;
-    var trainF = trains[k].trainFirst;
-    var trainFre = trains[k].trainFrequency;
-    console.log(trainz, trainzd, trainF, trainFre);
 
-    $(".trainInput").append(`
-        <tr>
-            <td>${trainz}</td>
-            <td>${trainzd}</td>
-            <td>${trainF} minutes</td>
-            <td>${trainFre}</td>
-            <td> minutes</td>
-        </tr>`);
-        
-          $("#name, #destination, #hours, #minutes, #frequency").val("");
-  }
-}
+    // Capture Button Click
+    $("#addTrain").on("click", function (event) {
+      event.preventDefault();
 
-  function errData(err) {
-    console.log("Error")
-    console.log(err);
-  }
+      // Grabbed values from text boxes
+      var name = $("#name").val().trim();
+      var destination = $("#destination").val().trim();
+      var hours = $("#hours").val();
+      var minutes = $("#minutes").val();
+      var arrival = hours + minutes;
+      var frequency = $("#frequency").val().trim();
 
-  // Capture Button Click
-  $("#addTrain").on("click", function (event) {
-    event.preventDefault();
-
-    // Grabbed values from text boxes
-    var name = $("#name").val().trim();
-    var destination = $("#destination").val().trim();
-    var hours = $("#hours").val();
-    var minutes = $("#minutes").val();
-    var arrival = hours + minutes;
-    var frequency = $("#frequency").val().trim();
-
-    var trainData = {
-      trainName: name,
-      trainDestination: destination,
-      trainFirst: arrival,
-      trainFrequency: frequency,
+      if (name === "" | destination === "" | hours === "" | minutes === "" | frequency === "") {
+        return false;
       }
-    
+
+      var trainData = {
+        name: name,
+        destination: destination,
+        starttime: arrival,
+        frequency: frequency,
+
+      }
+      clearField();
       ref.push(trainData);
-    
       console.log(firebase);
 
-        //next arrival time
-        var remaining = moment().add(frequency, "minutes").format('mm');
-        console.log(moment());
-        console.log(remaining);
-        console.log(arrival);
+    });
 
-    if (name === "" || destination === "" || hours === "" || minutes === "" || frequency === "")  {
-      alert("Please fill out all fields");
-      return false;
-    }
+    function nextTrainTime(x, y) {
 
-    if (frequency === "0") {
-    alert("Please enter a number greater than 0");
-    return false;
-    }
+      var frequency = x;
+      var firstTime = y;
 
-        // $(".trainInput").append(`
-        // <tr>
-        //     <td>${name}</td>
-        //     <td>${destination}</td>
-        //     <td>${frequency} minutes</td>
-        //     <td>${hours + ":" + minutes}</td>
-        //     <td>${remaining} minutes</td>
-        // </tr>`);
-        //   // Clear input fields
-        //   $("#name, #destination, #hours, #minutes, #frequency").val("");
-        //   return false;
-        });
+      // First Time (pushed back 1 year to make sure it comes before current time)
+      var converted = moment(firstTime, "hh:mm").subtract(1, "years");
 
-      });
+      var difference = moment().diff(moment(converted), "minutes");
+
+      var mod = difference % frequency;
+
+      remaining = frequency - mod;
+
+      nextTrain = moment().add(remaining, "minutes");
+      result = moment(nextTrain).format("hh:mm A");
+
+      return [result, remaining];
+    };
+
+
+    ref.on("child_added", function (snapshot) {
+      $(".trainInput").append(`
+        <tr>
+            <td>${snapshot.val().name}</td>
+            <td>${snapshot.val().destination}</td>
+            <td>${snapshot.val().frequency} minutes</td>
+            <td>${nextTrainTime(snapshot.val().frequency,snapshot.val().starttime)[0]}</td>
+            <td>${nextTrainTime(snapshot.val().frequency,snapshot.val().starttime)[1]} minutes</td>
+        </tr>
+        `);
+      console.log(snapshot);
+    });
+
+  }
+
+});
